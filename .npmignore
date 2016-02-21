@@ -1,0 +1,6 @@
+.tmp/
+bin/
+src/
+node_modules/
+test/
+typings/

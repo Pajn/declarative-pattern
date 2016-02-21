@@ -46,6 +46,10 @@ const avaliblePatterns: PatternDefinition<any>[] = [
     matches: pattern => Array.isArray(pattern),
   } as PatternDefinition<Array<PatternDefinition<any>>>,
   {
+    build: pattern => value => typeof value === 'string' && pattern.test(value),
+    matches: pattern => pattern instanceof RegExp,
+  },
+  {
     build: pattern => value => value instanceof pattern,
     matches: pattern => pattern && pattern[Symbol.species] !== undefined,
   },
@@ -85,6 +89,10 @@ const avaliblePatterns: PatternDefinition<any>[] = [
                      && typeof pattern === 'object'
                      && pattern.__proto__ === Object.prototype
                      ,
+  },
+  {
+    build: pattern => value => pattern(value),
+    matches: pattern => typeof pattern === 'function',
   },
 ]
 
@@ -144,3 +152,22 @@ export function pattern(): Pattern {
 
   return constructingPattern as Pattern
 }
+
+export function match(value, patternBuilder: (Pattern) => void) {
+  const match = pattern()
+  patternBuilder(match)
+  return match(value)
+}
+
+export const _ = () => true
+export const some = value => value !== null && value !== undefined
+export const none = value => value === null || value === undefined
+export const either = (...patterns) => {
+  patterns = patterns.map(findAndBuild)
+  return value => patterns.some(matches => matches(value))
+}
+export const range = (start: number, end: number) => value => start <= value && value <= end
+export const lt = (number: number) => value => value < number
+export const lte = (number: number) => value => value <= number
+export const gt = (number: number) => value => value > number
+export const gte = (number: number) => value => value >= number
