@@ -48,6 +48,28 @@ describe('pattern', () => {
     expect(whenMock.calls.length).to.equal(1)
     expect(whenMock.calls[0].args).to.deep.equal(['value'])
   })
+
+  it('should pass extra parameters to the when function', () => {
+    const whenMock = createMockFunction()
+
+    pattern()
+      .when(String, whenMock)
+      .match('value', 'extra', 'parameters')
+
+    expect(whenMock.calls.length).to.equal(1)
+    expect(whenMock.calls[0].args).to.deep.equal(['value', 'extra', 'parameters'])
+  })
+
+  it('should pass extra parameters to the default function', () => {
+    const defaultMock = createMockFunction()
+
+    pattern()
+      .default(defaultMock)
+      ('value', 'extra', 'parameters')
+
+    expect(defaultMock.calls.length).to.equal(1)
+    expect(defaultMock.calls[0].args).to.deep.equal(['value', 'extra', 'parameters'])
+  })
 })
 
 describe('patterns', () => {

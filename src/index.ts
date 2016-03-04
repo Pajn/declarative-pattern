@@ -5,19 +5,21 @@ type PatternDefinition<T> = {
   matches(pattern): boolean
 }
 
+export type MatchFunction = (value, ...extra) => any
+
 export interface ConstructingPattern {
-  (value): any,
+  (value, ...extra): any,
   when?(pattern, valueOrFunction): this
-  default?(valueOrFunction?): (value) => any
-  match?(value): any
-  close?(): (value) => any
+  default?(valueOrFunction?): MatchFunction
+  match?: MatchFunction
+  close?(): MatchFunction
 }
 
 export interface Pattern extends ConstructingPattern {
   when(pattern, valueOrFunction): this
-  default(valueOrFunction?): (value) => any
-  match(value): any
-  close(): (value) => any
+  default(valueOrFunction?): MatchFunction
+  match: MatchFunction
+  close(): MatchFunction
 }
 
 const objectEntries = object => Object.keys(object).map(key => [key, object[key]])
@@ -111,7 +113,7 @@ export function pattern(): Pattern {
   const noDefaultValue = {}
   let defaultValue: any = noDefaultValue
 
-  const constructingPattern: ConstructingPattern = value => {
+  const constructingPattern: ConstructingPattern = (value, ...extra) => {
     const matchingPattern = patterns.find(matches(value))
 
     if (!matchingPattern) {
@@ -120,14 +122,14 @@ export function pattern(): Pattern {
       }
 
       return typeof defaultValue === 'function'
-        ? defaultValue(value)
+        ? defaultValue(value, ...extra)
         : defaultValue
     }
 
     const {value: returnValue} = matchingPattern
 
     return typeof returnValue === 'function'
-      ? returnValue(value)
+      ? returnValue(value, ...extra)
       : returnValue
   }
 
@@ -146,9 +148,9 @@ export function pattern(): Pattern {
     return constructingPattern.close()
   }
 
-  constructingPattern.match = value => constructingPattern(value)
+  constructingPattern.match = (value, ...extra) => constructingPattern(value, ...extra)
 
-  constructingPattern.close = () => value => constructingPattern(value)
+  constructingPattern.close = () => (value, ...extra) => constructingPattern(value, ...extra)
 
   return constructingPattern as Pattern
 }

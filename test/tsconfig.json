@@ -15,8 +15,7 @@
     "outDir": "bin"
   },
   "filesGlob": [
-    "**/*.ts",
-    "!node_modules/**",
+    "specs/**/*.ts",
     "../typings/tsd.d.ts"
   ],
   "compileOnSave": true,
