@@ -140,6 +140,21 @@ describe('patterns', () => {
     })
   })
 
+  describe('date patterns', () => {
+    it('should support date patterns', () => {
+      const miss = createMockFunction()
+      const hit = createMockFunction()
+
+      pattern()
+        .when(new Date(1000, 10), miss)
+        .when(new Date(1000, 11), hit)
+        .match(new Date(1000, 11))
+
+      expect(miss.calls.length).to.equal(0)
+      expect(hit.calls.length).to.equal(1)
+    })
+  })
+
   describe('type patterns', () => {
     it('should support Array', () => {
       const match = pattern()

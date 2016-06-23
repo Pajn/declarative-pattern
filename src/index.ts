@@ -37,6 +37,10 @@ const avaliblePatterns: PatternDefinition<any>[] = [
                      ,
   },
   {
+    build: pattern => value => value.getTime() === pattern.getTime(),
+    matches: pattern => pattern instanceof Date,
+  },
+  {
     build: pattern => {
       const patterns = pattern.map(findAndBuild)
 
